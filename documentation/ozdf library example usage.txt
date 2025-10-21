@@ -1,0 +1,42 @@
+(I have notes after the relevant lines, not before)
+
+with ozdf.open_corpus_readonly('path/to/corpus') as corpus:
+  # corpus is a "Corpus" type, not a simple list; similarly, documents, blocks, list blocks, and list items are concrete types
+  (mockingbird, ) = [book for book in corpus where book.get_block("Title").get_text() == "To Kill a Mockingbird"]
+  foreach chapter in mockingbird.get_list_block("Content"):
+    # chapter is a ListItem
+    foreach paragraph in chapter:
+      # paragraph is a string
+      print(paragraph)
+
+or another example:
+
+with ozdf.open_corpus_readwrite('path/to/input_corpus', 'path/to/output/corpus') as corpus2:
+  # Note that output corpus shouldn't yet exist, and that any modifications will not alter the input.
+  # That being said, opening for readwrite will cause the entire output corpus to be created at that point, as a copy from input corpus, except that all of the text will be normalized.
+  foreach book in corpus2:
+    print(book.get_block("Title").get_text())
+    foreach chapter in enumerate(book.get_list_block("Content")):
+      foreach i, paragraph in enumerate(chapter):
+        chapter[i] = paragraph + " Yo,  that's dope!"
+        # this change flags the document as dirty, which will cause a write on save() (although non-dirty documents won't be saved)
+    corpus2.save()
+    # note, the save triggers a normalization of the paragraph data, and not before. So the extra space that we added gets removed at that time, both in the file that gets saved, as well as in the in-memory object.
+    # note that we could have waited for corpus2 to go out of scope, which will automatically trigger a save, but in this case, we want to save after we complete the work per book
+
+An example of loading a document directly:
+
+book = ozdf.open_document('path/to/document.ozdf')
+# note, when opening a document, they are always read-only
+print(book.get_block("Title").get_text())
+
+An example of adding and removing blocks, list blocks, list block items:
+
+with ozdf.open_corpus_readwrite('path/to/input_corpus', 'path/to/output/corpus') as corpus3:
+  (mockingbird, ) = [book for book in corpus where book.get_block("Title").get_text() == "To Kill a Mockingbird"]
+  mockingbird.add_block_last("Foo", "Contents here") # note: this should fail if Foo already exists
+  mockingbird.add_block_first("Bar", "A bar made of iron") # blocks don't have logical ordering, but they do have ordering within the ozdf file which gets preserved when saved. First or last just indicate where in the file the block should appear
+  mockingbird.remove_block("Foo")
+  mockingbird.add_list_block_last("Cars") # note that new list blocks start empty and need content added to them
+  # similar for first, and remove_list_block
+  # Note: list blocks and are fundamentally array-like data types, and blocks (and list items) are also fundamentally array-like data types; I'm not sure the best interface to give them so they are easy to manipulate

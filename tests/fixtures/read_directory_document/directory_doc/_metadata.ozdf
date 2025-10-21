@@ -1,0 +1,21 @@
+#### Title
+Directory Document Test
+
+#### Description
+This is a test directory document with external list blocks.
+
+#### [[Messages]]
+
+#### [Tags]
+==== Important
+This document is marked as important for testing purposes.
+
+==== Test
+This is a test tag with some description.
+
+==== Example
+An example tag to demonstrate non-external list blocks in directory documents.
+
+#### Author
+Test Author
+

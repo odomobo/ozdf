@@ -1,0 +1,137 @@
+# Introduction
+The Ozone Data Format (ozdf) is a human-readable format for storing unprocessed (or partially-processed) data for fine-tuning LLMs. The purposes of it are:
+
+1. To be easy to create.
+2. To be easy to read.
+3. To be unambigous to parse.
+4. To be easy to programmatically create.
+5. To have all the features necessary for processing training data.
+
+There are 2 specific things that it needs to provide:
+
+1. Metadata
+2. "data" data.
+
+Note that since it needs to be easy to create and read, the control instructions (headers) will be inline with the data, and it's important that the data doesn't have these control instructions. In fact, it simply won't be possible to have the control instructions inside of the data.
+
+# Overall structure
+At the highest level is an ozdf "corpus", which is a collection of 1 or more "document"s. You can liken a document to a book, an article, a chat transcription.
+
+Within a document, you can have 1 or more "blocks". A block is a piece of text data which contains 1 or more paragraphs. There's also a special type of block called a "list block", which contains 1 or more "list item"s. A list item contains 1 or more paragraphs.
+
+So here might be an example of how you have some structured data:
+
+You have a corpus, which contains multiple documents, each of which is a book. Each document has a block called "Title" (the book title), and a list block called "Content", which is all the content of the book. Within each list item in "Content" is a chapter from the book. Each chapter contains 1 or more paragraphs.
+
+So the corpus contains books, the books contain content, the content contains chapters, and the chapters contain paragraphs.
+
+Since ozdf is purpose-built and relatively inflexible, no additional levels of nesting are allowed.
+
+# Corpus
+
+A corpus is a a directory that holds multiple documents (either document files or document directories). A document file is an .ozdf file. A document directory is a directory that contains a single _metadata.ozdf file, and 1 or more .ozdp data part files.
+
+# Blocks
+An OZDF document file is broken down into 1 or more blocks. A block looks like this:
+
+	#### Block Name
+	Block data.
+	Block data.
+
+Note that I'm indenting just to visually separate examples from the text. The data must not be indented!
+
+Note that there must be no blank lines between a block name and its subsequent block data. Also note that there must be 1 blank line after the end of block data and before the next block. For example:
+
+	#### Block 1
+	Some block data.
+	Some more block data.
+
+	#### Block 2
+	Here's the next block data.
+
+# Comment blocks
+A comment block looks like this:
+
+	#### Comment
+	Comment text here
+
+Comment blocks are always fully ignored by the parser.
+
+# Block data processing
+OZDF is a little like html, in that whitespace is not preserved in the content. Single newlines, double spaces, tabs - these all are treated as a single whitespace. Double newlines (leaving a blank line between one line of text and the next) is used to separate paragraphs from each other.
+
+# List blocks
+A list block has its name surrounded by square brackets, and it's followed by 0 or more list items. List items each have an optional name. Let me show some examples:
+
+	#### [Conversation]
+	==== Joe
+	Hi Beth, how are you?
+	
+	==== Beth
+	I'm doing ok.
+	
+	How are you Joe?
+	
+	==== Joe
+	I'm doing terribly. Work is killing me. Goodbye cruel world.
+
+Here's another example of a list block without named list items:
+
+	#### [Shopping List]
+	====
+	Bananas
+	
+	====
+	Carrots
+	
+	====
+	Oranges
+
+# Directories
+An entire directory can be treated as the contents of a single ozdf file. In order for this to happen, the directory needs a file called "_metadata.ozdf". Then, this metadata file is extracted, along with all the ozdp (ozone data part) files in the same directory. The metadata file has all the high-level information.
+
+So basically, each data part file contains information to populate list blocks in the metadata file. The metadata file can have normal blocks and normal list blocks, but it can also have external list blocks. An external list block has 2 square brackets, like [[This]]. Let me give an example metadata file:
+
+	#### Copyright
+	(C) 2025
+	
+	#### [[Book Chapters]]
+	
+Let me give two example ozdp files to go along with that:
+
+BOOK_CHAPTERS-01.ozdp
+
+	#### NAME
+	The Awakening
+	
+	#### DATA
+	It was a dark and stormy night...
+	
+BOOK_CHAPTERS-01.ozdp
+
+	#### NAME
+	The Curse
+	
+	#### DATA
+	They found themselves at a crossroads...
+	
+The reason to break the data into multiple files is for practicality. Instead of breaking it up into different files in a directory structure (the metadata file and the 2 ozdp files), this is all equivalent to the following ozdf file:
+
+	#### Copyright
+	(C) 2025
+	
+	#### [Book Chapters]
+	==== The Awakening
+	It was a dark and stormy night...
+	
+	==== The Curse
+	They found themselves at a crossroads...
+	
+
+So, the external list blocks get populated dynamically from the ozdp files, each of which is like an element in an array. Note that indexes for ozdp files must start at 1, not 0, and must be sequential
+
+# Capitalization
+Capitalization is always optional. Block names get converted to uppercase by parsers.
+
+# Invalid data
+No line can start with 3 or more # or 3 or more =, unless it's a block or a list item.

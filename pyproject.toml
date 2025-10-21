@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ozdf"
+version = "0.1.0"
+description = "OZDF (Ozone Data Format) - A human-readable format for LLM training data"
+readme = "README.md"
+requires-python = ">=3.7"
+authors = [
+    {name = "odomobo"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/odomobo/ozdf"
+
+[project.optional-dependencies]
+test = [
+    "pytest >= 7.0.0"
+]

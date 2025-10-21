@@ -1,0 +1,65 @@
+# OZDF Python Library - Quick Reference
+
+Note: parameters listed in [square brackets] are optional.
+
+## Entry Points (ozdf.io)
+
+open_corpus_readonly(corpus_path) -> Corpus
+open_corpus_readwrite(input_path, output_path) -> Corpus
+open_corpus_writeonly(save_path) -> Corpus
+open_document(document_path) -> Document
+
+## Corpus
+
+Corpus.add_document(filename) -> Document
+Corpus.add_directory_document(dirname) -> DirectoryDocument
+Corpus.save() -> None                       # errors if opened read-only
+Corpus.__iter__() -> Iterator[Document]     # document iterator
+Corpus.__len__() -> int                     # document count
+
+## Document
+
+Document.get_block(name) -> Block
+Document.get_list_block(name) -> ListBlock
+Document.add_block_first(name, [content]) -> Block
+Document.add_block_last(name, [content]) -> Block
+Document.remove_block(name) -> None
+Document.add_list_block_first(name) -> ListBlock
+Document.add_list_block_last(name) -> ListBlock
+Document.remove_list_block(name) -> None    # also removes external list blocks
+Document.is_directory() -> bool
+Document.save_to(directory) -> None         # usually prefer Corpus.save()
+DirectoryDocument.add_external_list_block_first(name) -> ExternalListBlock
+DirectoryDocument.add_external_list_block_last(name) -> ExternalListBlock
+
+## Block
+
+Block.get_text() -> str
+Block.set_text(text) -> None
+Block.set_paragraphs(paragraphs) -> None
+Block.append(paragraph) -> None
+Block.__iter__() -> Iterator[str]           # paragraph iterator
+Block.__len__() -> int                      # paragraph count
+Block.__getitem__(index) -> str             # get paragraph
+Block.__setitem__(index, value) -> None     # set paragraph
+
+## ListBlock
+
+ListBlock.add_list_item([name], [content]) -> ListItem
+ListBlock.set_list_items(items) -> None
+ListBlock.is_external() -> bool
+ListBlock.__iter__() -> Iterator[ListItem]  # list item iterator
+ListBlock.__len__() -> int                  # list item count
+ListBlock.__getitem__(index) -> ListItem    # get list item
+
+## ListItem (extends Block)
+
+ListItem.get_name() -> Optional[str]
+ListItem.get_text() -> str
+ListItem.set_text(text) -> None
+ListItem.set_paragraphs(paragraphs) -> None
+ListItem.append(paragraph) -> None
+ListItem.__iter__() -> Iterator[str]        # paragraph iterator
+ListItem.__len__() -> int                   # paragraph count
+ListItem.__getitem__(index) -> str          # get paragraph
+ListItem.__setitem__(index, value) -> None  # set paragraph

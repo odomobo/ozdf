@@ -15,13 +15,13 @@ Louisa May Alcott
 
 #### [BOOK CHAPTERS]
 ==== PLAYING PILGRIMS
-"Christmas won’t be Christmas without any presents," grumbled Jo, lying
+"Christmas won't be Christmas without any presents," grumbled Jo, lying
 on the rug.
 
-"It’s so dreadful to be poor!" sighed Meg, looking down at her old
+"It's so dreadful to be poor!" sighed Meg, looking down at her old
 dress.
 
-"I don’t think it’s fair for some girls to have plenty of pretty
+"I don't think it's fair for some girls to have plenty of pretty
 things, and other girls nothing at all," added little Amy, with an
 injured sniff.
 
@@ -77,7 +77,7 @@ BOOK_CHAPTERS-01.ozdp:
 PLAYING PILGRIMS
 
 #### DATA
-"Christmas won’t be Christmas without any presents," grumbled Jo, lying
+"Christmas won't be Christmas without any presents," grumbled Jo, lying
 on the rug.
 
 ...
